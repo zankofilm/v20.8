@@ -1,21 +1,37 @@
-name: Build Electron App
+name: Build Native Admin No Port
 
 on:
   push:
     branches:
       - main
+      - master
   workflow_dispatch:
 
 jobs:
-  build:
+  build-native-admin:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
-      - run: npm install
-      - run: npm run dist
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Electron app
+        run: npm run dist
+        env:
+          GH_TOKEN: ""
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+          ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: JavanroodAdmin-build
+          path: installer_output/**
